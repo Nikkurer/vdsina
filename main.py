@@ -1,8 +1,7 @@
 import argparse
 import os
 import requests
-from Server import Server
-from Account import Account
+from Vdsina import Account, Server
 
 API_URL = 'https://userapi.vdsina.ru/v1/'
 LOGIN = os.getenv('LOGIN')
