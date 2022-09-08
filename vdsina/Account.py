@@ -1,21 +1,11 @@
-import json
-import os
+from .Auth import Auth
+from .common import check_response
 
 
-def check_response(response_raw):
-    if response_raw.status_code == 200:
-        response = response_raw.json()
-        return response['data']
-    else:
-        print(response_raw.content.decode())
-        return None
-
-
-class Account:
-    def __init__(self, session, api_url):
-        self.session = session
-        self.api_url = api_url
-        self.token = self.check_auth()
+class Account(Auth):
+    def __init__(self, instance):
+        self.session = instance.session
+        self.api_url = instance.api_url
         self.account = 'account'
         self.balance = 'account.balance'
         self.limits = 'account.limit'
@@ -35,24 +25,6 @@ class Account:
             limits = f'{limits}\n  {key.capitalize()}: {substr}'
         result = f'{account}\n{balance}\n{limits}'
         return result
-
-    def get_token(self, login, password) -> str:
-        url = f'{self.api_url}auth'
-        payload = json.dumps({'email': login, 'password': password})
-        response = self.session.post(url, data=payload)
-        return check_response(response)['token']
-
-    def check_auth(self) -> str | None:
-        token = os.getenv('TOKEN')
-        login = os.getenv('LOGIN')
-        password = os.getenv('PASSWORD')
-        if token:
-            return token
-        elif login and password:
-            return self.get_token(login, password)
-        else:
-            print(f'You should set the environment variables TOKEN or LOGIN and PASSWORD')
-            return None
 
     def get_account_info(self):
         self.account = self.get_account()

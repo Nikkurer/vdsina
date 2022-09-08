@@ -1,7 +1,6 @@
 import argparse
 import os
-import requests
-from Vdsina import Account, Server
+from vdsina import Account, Server, Auth
 
 API_URL = 'https://userapi.vdsina.ru/v1/'
 LOGIN = os.getenv('LOGIN')
@@ -17,12 +16,9 @@ def get_arguments():
 
 
 if __name__ == '__main__':
-    session = requests.Session()
-    session.headers.update({'Content-Type': 'application/json'})
-    instance = Account(session, API_URL)
-    session.headers.update({'Authorization': instance.check_auth()})
+    instance = Auth(API_URL)
     servers = []
-    for server in instance.get_servers():
+    for server in Account.get_servers(instance):
         servers.append(Server(server))
     for server in servers:
         print(server)
