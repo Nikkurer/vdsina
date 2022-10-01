@@ -17,9 +17,9 @@ class Auth:
 
     def get_session(self):
         def check_auth() -> str | None:
-            token = os.getenv('TOKEN')
-            login = os.getenv('LOGIN')
-            password = os.getenv('PASSWORD')
+            token = os.getenv('VDSINA_TOKEN')
+            login = os.getenv('VDSINA_LOGIN')
+            password = os.getenv('VDSINA_PASSWORD')
             if token:
                 return token
             elif login and password:
