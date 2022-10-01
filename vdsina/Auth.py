@@ -8,7 +8,7 @@ class Auth:
     """
     A class for authorization
     """
-    def __init__(self, api_url):
+    def __init__(self, api_url: str):
         self.api_url = api_url
         self.session = self.get_session()
 
