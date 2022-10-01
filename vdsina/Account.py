@@ -3,6 +3,11 @@ from .common import check_response
 
 
 class Account(Auth):
+    limits = None
+    balance = None
+    account = None
+    server_groups = None
+
     def __init__(self, instance, api_url):
         super().__init__(api_url)
         self.session = instance.session
