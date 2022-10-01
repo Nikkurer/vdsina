@@ -6,7 +6,10 @@ from .common import check_response
 
 class Auth:
     """
-    A class for authorization
+    A class for authorization at vdsina.ru API
+
+    Agrs:
+        api_url (str): Provider API server URL
     """
     def __init__(self, api_url: str):
         self.api_url = api_url
