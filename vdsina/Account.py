@@ -23,6 +23,8 @@ class Account(Auth):
                 substr = f'{value["now"]}/{value["max"]}'
             elif isinstance(value, list | tuple | set):
                 substr = f'{str(value)}'
+            else:
+                raise TypeError()
             limits = f'{limits}\n  {key.capitalize()}: {substr}'
         result = f'{account}\n{balance}\n{limits}'
         return result
