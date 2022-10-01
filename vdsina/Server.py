@@ -16,5 +16,4 @@ class Server:
         self.gateway = server['ip']['gateway']
 
     def __str__(self) -> str:
-        result = f'name: {self.name}\nip: {self.ipaddress}\nfqdn: {self.fqdn}'
-        return result
+        return f'name: {self.name}\nip: {self.ipaddress}\nfqdn: {self.fqdn}'
