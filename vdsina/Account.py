@@ -12,11 +12,6 @@ class Account(Auth):
         super().__init__(api_url)
         self.session = instance.session
         self.api_url = instance.api_url
-        self.account = 'account'
-        self.balance = 'account.balance'
-        self.limits = 'account.limit'
-        self.server_groups = 'server-group'
-        self.ssh_keys = 'ssh-key'
 
     def __str__(self) -> str:
         account = f'Account:\n  Created: {self.account["created"]}\n  Forecast: {self.account["forecast"]}'
