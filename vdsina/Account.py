@@ -3,7 +3,8 @@ from .common import check_response
 
 
 class Account(Auth):
-    def __init__(self, instance):
+    def __init__(self, instance, api_url):
+        super().__init__(api_url)
         self.session = instance.session
         self.api_url = instance.api_url
         self.account = 'account'
