@@ -1,5 +1,4 @@
 import argparse
-from vdsina.Auth import Auth
 from vdsina.Server import Server
 from vdsina.Account import Account
 
