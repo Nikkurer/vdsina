@@ -67,3 +67,10 @@ class Account(Auth):
         url = f'{self.api_url}server-plan/{sg_id}'
         response = self.session.get(url)
         self.server_plans[sg_id] = check_response(response)
+
+    def create_user(self, email):
+        url = f'{self.api_url}register'
+        # TODO: add partner code support
+        payload = json.dumps({"email": email})
+        response = self.session.post(url, data=payload)
+        return check_response(response)
