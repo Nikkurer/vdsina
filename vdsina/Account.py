@@ -22,7 +22,7 @@ class Account(Auth):
     balance = None
     account = None
     servers = None
-    ssh_keys = None
+    ssh_keys = []
     templates = None
     datacenters = None
     server_groups = None
