@@ -1,5 +1,4 @@
 import json
-
 from .Auth import Auth
 from .common import check_response
 from email_validator import validate_email, EmailNotValidError
@@ -89,3 +88,16 @@ class Account(Auth):
         ssh_keys = self.get_parameter('ssh-key')
         for ssh_key in ssh_keys:
             self.ssh_keys.append(self.get_parameter('ssh-key', ssh_key['id']))
+
+    def add_ssh_key(self, name: str, data: str):
+        url = f'{self.api_url}ssh-key'
+        payload = json.dumps({'name': name, 'data': data})
+        response = self.session.post(url, data=payload)
+        self.get_ssh_keys()
+        return check_response(response)
+
+    def delete_ssh_key(self, ssh_key_id: int):
+        url = f'{self.api_url}ssh-key/{ssh_key_id}'
+        response = self.session.delete(url)
+        self.get_ssh_keys()
+        return check_response(response)
