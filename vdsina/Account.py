@@ -32,11 +32,11 @@ class Account(Auth):
             api_url (str): API server URL
         """
         super().__init__(api_url)
-        self.account = self.get_parameter('account')
         self.servers = self.get_parameter('server')
+        self.account = self.get_parameter('account')
         self.templates = self.get_parameter('template')
-        self.datacenters = self.get_parameter('datacenter')
         self.limits = self.get_parameter('account.limit')
+        self.datacenters = self.get_parameter('datacenter')
         self.balance = self.get_parameter('account.balance')
         self.server_groups = self.get_parameter('server-group')
         self.get_ssh_keys()
