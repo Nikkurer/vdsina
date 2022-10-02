@@ -20,11 +20,19 @@ class Account(Auth):
     balance = None
     account = None
     server_groups = None
+    server_plans = {}
+    parameters = {'account': 'account', 'balance': 'account.balance', 'limits': 'account.limit', 'server-group': 'server-group',
+                  'ssh-key': 'ssh-key', 'server': 'server', 'datacenters': 'datacenter', 'templates': 'template', }
 
-    def __init__(self, instance, api_url):
+    def __init__(self, api_url: str):
+        """Inits Account with api_url (str) as provider API server URL"""
         super().__init__(api_url)
-        self.session = instance.session
-        self.api_url = instance.api_url
+        self.account = self.get_account()
+        self.balance = self.get_balance()
+        self.limits = self.get_limits()
+        self.server_groups = self.get_server_groups()
+        for server_group in self.server_groups:
+            self.get_sever_plans(server_group['id'])
 
     def __str__(self) -> str:
         account = f'Account:\n  Created: {self.account["created"]}\n  Forecast: {self.account["forecast"]}'
@@ -71,7 +79,12 @@ class Account(Auth):
     def get_server_groups(self):
         url = f'{self.api_url}server-group'
         response = self.session.get(url)
-        self.server_groups = check_response(response)
+        return check_response(response)
+
+    def get_sever_plans(self, sg_id):
+        url = f'{self.api_url}server-plan/{sg_id}'
+        response = self.session.get(url)
+        self.server_plans[sg_id] = check_response(response)
 
     def get_ssh_keys(self):
         url = f'{self.api_url}ssh-key'
