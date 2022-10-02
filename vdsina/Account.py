@@ -59,7 +59,7 @@ class Account(Auth):
         result = f'{account}\n{balance}\n{limits}'
         return result
 
-    def get_parameter(self, endpoint, parameter_id: int = None):
+    def get_parameter(self, endpoint: str, parameter_id: int = None):
         """
         Get parameter by its endpoint
         Args:
