@@ -7,4 +7,4 @@ def check_response(response_raw):
         return response['data']
     else:
         print(response_raw.content.decode())
-        exit(1)
+        raise response_raw.raise_for_status()
