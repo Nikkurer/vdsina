@@ -53,7 +53,7 @@ class Account(Auth):
         return result
 
     def get_parameter(self, endpoint):
-        """Get parameter by its name"""
+        """Get parameter by its endpoint"""
         url = f'{self.api_url}{endpoint}'
         response = self.session.get(url)
         raw_data = check_response(response)
