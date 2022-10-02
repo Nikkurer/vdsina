@@ -18,7 +18,7 @@ class Account(Auth):
     limits = None
     balance = None
     account = None
-    servers = None
+    servers = []
     ssh_keys = []
     iso_images = []
     templates = None
@@ -33,13 +33,13 @@ class Account(Auth):
             api_url (str): API server URL
         """
         super().__init__(api_url)
-        self.servers = self.get_parameter('server')
         self.account = self.get_parameter('account')
         self.templates = self.get_parameter('template')
         self.limits = self.get_parameter('account.limit')
         self.datacenters = self.get_parameter('datacenter')
         self.balance = self.get_parameter('account.balance')
         self.server_groups = self.get_parameter('server-group')
+        self.get_servers()
         self.get_ssh_keys()
         self.get_iso_images()
         for server_group in self.server_groups:
@@ -164,3 +164,10 @@ class Account(Auth):
         response = self.session.delete(url)
         self.get_ssh_keys()
         return check_response(response)
+
+    def get_servers(self) -> list:
+        self.servers = []
+        servers = self.get_parameter('server')
+        for server in servers:
+            self.servers.append(self.get_parameter('server', server['id']))
+
