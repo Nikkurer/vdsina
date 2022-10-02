@@ -6,7 +6,7 @@ from .common import check_response
 
 class Auth:
     """
-    A class for authorization at vdsina.ru API
+    The class for authorization at vdsina.ru API
 
     Agrs:
         api_url (str): Provider API server URL
@@ -37,7 +37,10 @@ class Auth:
         payload = json.dumps({'email': login, 'password': password})
         session = requests.Session()
         response = session.post(url, data=payload)
-        return check_response(response)['token']
+        if response.ok:
+            return check_response(response)['token']
+        else:
+            raise response.raise_for_status()
 
 
 
