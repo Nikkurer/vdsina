@@ -1,3 +1,5 @@
+import json
+
 from .Auth import Auth
 from .common import check_response
 
