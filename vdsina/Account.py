@@ -122,12 +122,6 @@ class Account(Auth):
         except EmailNotValidError as e:
             return str(e)
 
-    def get_ssh_keys(self):
-        self.ssh_keys = []
-        ssh_keys = self.get_parameter('ssh-key')
-        for ssh_key in ssh_keys:
-            self.ssh_keys.append(self.get_parameter('ssh-key', ssh_key['id']))
-
     def add_ssh_key(self, name: str, data: str):
         """
         Adds new ssh key
