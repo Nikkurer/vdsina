@@ -21,6 +21,8 @@ class Account(Auth):
     account = None
     servers = None
     ssh_keys = None
+    templates = None
+    datacenters = None
     server_groups = None
     server_plans = {}
 
@@ -28,11 +30,14 @@ class Account(Auth):
         """Inits Account with api_url (str) as provider API server URL"""
         super().__init__(api_url)
         self.account = self.get_parameter('account')
-        self.balance = self.get_parameter('account.balance')
-        self.limits = self.get_parameter('account.limit')
         self.servers = self.get_parameter('server')
         self.ssh_keys = self.get_parameter('ssh-key')
+        self.templates = self.get_parameter('template')
+        self.datacenters = self.get_parameter('datacenter')
+        self.limits = self.get_parameter('account.limit')
+        self.balance = self.get_parameter('account.balance')
         self.server_groups = self.get_parameter('server-group')
+
         for server_group in self.server_groups:
             self.get_sever_plans(server_group['id'])
 
@@ -56,8 +61,7 @@ class Account(Auth):
         """Get parameter by its endpoint"""
         url = f'{self.api_url}{endpoint}'
         response = self.session.get(url)
-        raw_data = check_response(response)
-        return raw_data
+        return check_response(response)
 
     def get_sever_plans(self, sg_id):
         url = f'{self.api_url}server-plan/{sg_id}'
