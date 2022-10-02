@@ -19,18 +19,20 @@ class Account(Auth):
     limits = None
     balance = None
     account = None
+    servers = None
+    ssh_keys = None
     server_groups = None
     server_plans = {}
-    parameters = {'account': 'account', 'balance': 'account.balance', 'limits': 'account.limit', 'server-group': 'server-group',
-                  'ssh-key': 'ssh-key', 'server': 'server', 'datacenters': 'datacenter', 'templates': 'template', }
 
     def __init__(self, api_url: str):
         """Inits Account with api_url (str) as provider API server URL"""
         super().__init__(api_url)
-        self.account = self.get_account()
-        self.balance = self.get_balance()
-        self.limits = self.get_limits()
-        self.server_groups = self.get_server_groups()
+        self.account = self.get_parameter('account')
+        self.balance = self.get_parameter('account.balance')
+        self.limits = self.get_parameter('account.limit')
+        self.servers = self.get_parameter('server')
+        self.ssh_keys = self.get_parameter('ssh-key')
+        self.server_groups = self.get_parameter('server-group')
         for server_group in self.server_groups:
             self.get_sever_plans(server_group['id'])
 
@@ -50,48 +52,14 @@ class Account(Auth):
         result = f'{account}\n{balance}\n{limits}'
         return result
 
-    def get_account_info(self):
-        self.account = self.get_account()
-        self.balance = self.get_balance()
-        self.limits = self.get_limits()
-
     def get_parameter(self, endpoint):
+        """Get parameter by its name"""
         url = f'{self.api_url}{endpoint}'
         response = self.session.get(url)
         raw_data = check_response(response)
         return raw_data
 
-    def get_account(self) -> dict:
-        url = f'{self.api_url}account'
-        response = self.session.get(url)
-        return check_response(response)
-
-    def get_balance(self) -> dict:
-        url = f'{self.api_url}account.balance'
-        response = self.session.get(url)
-        return check_response(response)
-
-    def get_limits(self) -> dict:
-        url = f'{self.api_url}account.limit'
-        response = self.session.get(url)
-        return check_response(response)
-
-    def get_server_groups(self):
-        url = f'{self.api_url}server-group'
-        response = self.session.get(url)
-        return check_response(response)
-
     def get_sever_plans(self, sg_id):
         url = f'{self.api_url}server-plan/{sg_id}'
         response = self.session.get(url)
         self.server_plans[sg_id] = check_response(response)
-
-    def get_ssh_keys(self):
-        url = f'{self.api_url}ssh-key'
-        response = self.session.get(url)
-        return check_response(response)
-
-    def get_servers(self):
-        url = f'{self.api_url}server'
-        response = self.session.get(url)
-        return check_response(response)

@@ -15,9 +15,10 @@ def get_arguments():
 if __name__ == '__main__':
     servers = []
     account = Account(API_URL)
-    for server in account.get_servers():
+    print(account)
+    print(f'Servers:')
+    for server in account.servers:
         servers.append(Server(server))
     for server in servers:
         print(server)
-    print(account)
 
