@@ -15,26 +15,28 @@ def get_arguments():
 if __name__ == '__main__':
     servers = []
     account = Account(API_URL)
-    print(account)
-    print(f'Servers:')
-    for server in account.servers:
-        servers.append(Server(server))
-    for server in servers:
-        print(server)
-
     while True:
-        action = input('What do you want to do? ((S)how|(A)dd|(D)elete|(E)xit ')
-        if action in ('Show', 'S'):
-            for ssh_key in account.ssh_keys:
-                print(ssh_key)
-        elif action in ('Add', 'A'):
-            ssh_key_name = input('Enter ssh key name: ')
-            ssh_key_fingerprint = input('Enter public ssh key: ')
-            account.add_ssh_key(ssh_key_name, ssh_key_fingerprint)
-        elif action in ('Delete', 'D'):
-            ssh_key_id = input('Which key you want to delete? (id) ')
-            account.delete_ssh_key(int(ssh_key_id))
-        else:
-            break
-
-
+        action = input('What is your interest?\n1. A\u0332ccount|S\u0332ervers|SSH k\u0332eys')
+        if action.lower() in ('a', 'account'):
+            print(account)
+        elif action.lower() in ('s', 'servers'):
+            for server in account.servers:
+                servers.append(Server(server))
+            for server in servers:
+                print(server)
+        elif action.lower() in ('k', 'keys'):
+            while True:
+                action = input('What do you want to do? S\u0332how|A\u0332dd|D\u0332elete|E\u0332xit ')
+                if action in ('Show', 'S'):
+                    for ssh_key in account.ssh_keys:
+                        print(ssh_key)
+                elif action in ('Add', 'A'):
+                    ssh_key_name = input('Enter ssh key name: ')
+                    ssh_key_fingerprint = input('Enter public ssh key: ')
+                    account.add_ssh_key(ssh_key_name, ssh_key_fingerprint)
+                elif action in ('Delete', 'D'):
+                    ssh_key_id = input('Which key you want to delete? (id) ')
+                    account.delete_ssh_key(int(ssh_key_id))
+                else:
+                    break
+        account.create_user('atrifonov2@rencredit.ru')
