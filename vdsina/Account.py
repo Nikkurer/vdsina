@@ -33,13 +33,12 @@ class Account(Auth):
         super().__init__(api_url)
         self.account = self.get_parameter('account')
         self.servers = self.get_parameter('server')
-        self.ssh_keys = self.get_parameter('ssh-key')
         self.templates = self.get_parameter('template')
         self.datacenters = self.get_parameter('datacenter')
         self.limits = self.get_parameter('account.limit')
         self.balance = self.get_parameter('account.balance')
         self.server_groups = self.get_parameter('server-group')
-
+        self.get_ssh_keys()
         for server_group in self.server_groups:
             self.get_sever_plans(server_group['id'])
 
@@ -59,9 +58,11 @@ class Account(Auth):
         result = f'{account}\n{balance}\n{limits}'
         return result
 
-    def get_parameter(self, endpoint):
+    def get_parameter(self, endpoint, parameter_id=None):
         """Get parameter by its endpoint"""
         url = f'{self.api_url}{endpoint}'
+        if parameter_id:
+            url = f'{url}/{parameter_id}'
         response = self.session.get(url)
         return check_response(response)
 
@@ -76,3 +77,9 @@ class Account(Auth):
         payload = json.dumps({"email": email})
         response = self.session.post(url, data=payload)
         return check_response(response)
+
+    def get_ssh_keys(self):
+        self.ssh_keys = []
+        ssh_keys = self.get_parameter('ssh-key')
+        for ssh_key in ssh_keys:
+            self.ssh_keys.append(self.get_parameter('ssh-key', ssh_key['id']))
