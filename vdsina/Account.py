@@ -2,6 +2,7 @@ import json
 
 from .Auth import Auth
 from .common import check_response
+from email_validator import validate_email, EmailNotValidError
 
 
 class Account(Auth):
@@ -71,12 +72,17 @@ class Account(Auth):
         response = self.session.get(url)
         self.server_plans[sg_id] = check_response(response)
 
-    def create_user(self, email):
+    def create_user(self, email: str):
         url = f'{self.api_url}register'
         # TODO: add partner code support
-        payload = json.dumps({"email": email})
-        response = self.session.post(url, data=payload)
-        return check_response(response)
+        try:
+            validation = validate_email(email, check_deliverability=False)
+            email = validation.email
+            payload = json.dumps({"email": email})
+            response = self.session.post(url, data=payload)
+            return check_response(response)
+        except EmailNotValidError as e:
+            return str(e)
 
     def get_ssh_keys(self):
         self.ssh_keys = []
