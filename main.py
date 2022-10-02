@@ -14,7 +14,6 @@ def get_arguments():
 
 
 if __name__ == '__main__':
-    instance = Auth(API_URL)
     servers = []
     account = Account(API_URL)
     for server in account.get_servers():
