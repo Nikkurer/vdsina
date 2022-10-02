@@ -20,6 +20,7 @@ class Account(Auth):
     account = None
     servers = None
     ssh_keys = []
+    iso_images = []
     templates = None
     datacenters = None
     server_groups = None
@@ -40,6 +41,7 @@ class Account(Auth):
         self.balance = self.get_parameter('account.balance')
         self.server_groups = self.get_parameter('server-group')
         self.get_ssh_keys()
+        self.get_iso_images()
         for server_group in self.server_groups:
             self.get_sever_plans(server_group['id'])
 
@@ -89,6 +91,19 @@ class Account(Auth):
         url = f'{self.api_url}server-plan/{sg_id}'
         response = self.session.get(url)
         self.server_plans[sg_id] = check_response(response)
+
+    def get_iso_images(self) -> list:
+        """
+        Get available ISO images
+        Returns:
+            List of available ISO images
+        Raises:
+            HTTPError: If http status code not 20X
+        """
+        iso_images = self.get_parameter('iso')
+        if iso_images:
+            for iso_image in iso_images:
+                self.ssh_keys.append(self.get_parameter('iso', iso_image['id']))
 
     def get_ssh_keys(self) -> list:
         """
