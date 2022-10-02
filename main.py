@@ -16,8 +16,10 @@ def get_arguments():
 if __name__ == '__main__':
     instance = Auth(API_URL)
     servers = []
-    for server in Account.get_servers(instance):
+    account = Account(API_URL)
+    for server in account.get_servers():
         servers.append(Server(server))
     for server in servers:
         print(server)
+    print(account)
 
