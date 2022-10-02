@@ -6,12 +6,9 @@ from email_validator import validate_email, EmailNotValidError
 
 class Account(Auth):
     """VDSina account info
-
     The class for getting information about VDSina account and do some operations with it
-
     Args:
          api_url (str): Provider API server URL
-
     Attributes:
         account (dict): Account info
         limits (dict): Account limits
@@ -29,7 +26,11 @@ class Account(Auth):
     server_plans = {}
 
     def __init__(self, api_url: str):
-        """Inits Account with api_url (str) as provider API server URL"""
+        """
+        Inits Account with api_url (str) as provider API server URL
+        Args:
+            api_url (str): API server URL
+        """
         super().__init__(api_url)
         self.account = self.get_parameter('account')
         self.servers = self.get_parameter('server')
@@ -58,20 +59,58 @@ class Account(Auth):
         result = f'{account}\n{balance}\n{limits}'
         return result
 
-    def get_parameter(self, endpoint, parameter_id=None):
-        """Get parameter by its endpoint"""
+    def get_parameter(self, endpoint, parameter_id: int = None):
+        """
+        Get parameter by its endpoint
+        Args:
+            endpoint (str): Endpoint name after API URL
+            parameter_id (int): Optional. If parameter can get id
+        Returns:
+            Result of http request
+        Raises:
+            HTTPError: If http status code not 20X
+        """
         url = f'{self.api_url}{endpoint}'
         if parameter_id:
             url = f'{url}/{parameter_id}'
         response = self.session.get(url)
         return check_response(response)
 
-    def get_sever_plans(self, sg_id):
+    def get_sever_plans(self, sg_id: int) -> list:
+        """
+        Get server plans for a specific server group
+        Args:
+            sg_id (int): Server group id
+        Returns:
+            List of dictionaries with server plans
+        Raises:
+            HTTPError: If http status code not 20X
+        """
         url = f'{self.api_url}server-plan/{sg_id}'
         response = self.session.get(url)
         self.server_plans[sg_id] = check_response(response)
 
+    def get_ssh_keys(self) -> list:
+        """
+        Get ssh keys list
+        Returns:
+            List of ssh keys for account
+        Raises:
+            HTTPError: If http status code not 20X
+        """
+        self.ssh_keys = []
+        ssh_keys = self.get_parameter('ssh-key')
+        for ssh_key in ssh_keys:
+            self.ssh_keys.append(self.get_parameter('ssh-key', ssh_key['id']))
+
     def create_user(self, email: str):
+        """
+        Create user account
+        Args:
+            email (str): string with email
+        Raises:
+            HTTPError: If http status code not 20X
+        """
         url = f'{self.api_url}register'
         # TODO: add partner code support
         try:
@@ -90,6 +129,14 @@ class Account(Auth):
             self.ssh_keys.append(self.get_parameter('ssh-key', ssh_key['id']))
 
     def add_ssh_key(self, name: str, data: str):
+        """
+        Adds new ssh key
+        Args:
+            name (str): name of new ssh key
+            data (str): public part of ssh key
+        Raises:
+            HTTPError: If http status code not 20X
+        """
         url = f'{self.api_url}ssh-key'
         payload = json.dumps({'name': name, 'data': data})
         response = self.session.post(url, data=payload)
@@ -97,6 +144,13 @@ class Account(Auth):
         return check_response(response)
 
     def delete_ssh_key(self, ssh_key_id: int):
+        """
+         new ssh key
+        Args:
+            ssh_key_id (int): SSH key id
+        Raises:
+            HTTPError: If http status code not 20X
+        """
         url = f'{self.api_url}ssh-key/{ssh_key_id}'
         response = self.session.delete(url)
         self.get_ssh_keys()
