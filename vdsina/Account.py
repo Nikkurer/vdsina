@@ -3,6 +3,19 @@ from .common import check_response
 
 
 class Account(Auth):
+    """VDSina account info
+
+    The class for getting information about VDSina account and do some operations with it
+
+    Args:
+         api_url (str): Provider API server URL
+
+    Attributes:
+        account (dict): Account info
+        limits (dict): Account limits
+        balance (dict): Account balance
+        server_groups (list): Account available server groups
+    """
     limits = None
     balance = None
     account = None
