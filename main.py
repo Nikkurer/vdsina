@@ -1,5 +1,5 @@
 import argparse
-from vdsina.Server import Server
+from vdsina.Objects import Server
 from vdsina.Account import Account
 
 API_URL = 'https://userapi.vdsina.ru/v1/'
@@ -15,6 +15,8 @@ def get_arguments():
 if __name__ == '__main__':
     servers = []
     account = Account(API_URL)
+    for server in account.servers:
+        print(Server(server))
     while True:
         action = input('What is your interest?\n1. A\u0332ccount|S\u0332ervers|SSH k\u0332eys')
         if action.lower() in ('a', 'account'):
@@ -39,4 +41,4 @@ if __name__ == '__main__':
                     account.delete_ssh_key(int(ssh_key_id))
                 else:
                     break
-        account.create_user('atrifonov2@rencredit.ru')
+    # account.create_user('atrifonov2@rencredit.ru')

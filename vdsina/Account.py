@@ -1,10 +1,11 @@
 import json
-from .Auth import Auth
+from .Service import Service
+from .Objects import Server, SshKey, IsoImage
 from .common import check_response
 from email_validator import validate_email, EmailNotValidError
 
 
-class Account(Auth):
+class Account(Service):
     """VDSina account info
     The class for getting information about VDSina account and do some operations with it
     Args:
@@ -24,7 +25,7 @@ class Account(Auth):
     templates = None
     datacenters = None
     server_groups = None
-    server_plans = {}
+    server_plans = []
 
     def __init__(self, api_url: str):
         """
@@ -33,17 +34,16 @@ class Account(Auth):
             api_url (str): API server URL
         """
         super().__init__(api_url)
-        self.account = self.get_parameter('account')
-        self.templates = self.get_parameter('template')
-        self.limits = self.get_parameter('account.limit')
-        self.datacenters = self.get_parameter('datacenter')
-        self.balance = self.get_parameter('account.balance')
-        self.server_groups = self.get_parameter('server-group')
-        self.get_servers()
-        self.get_ssh_keys()
-        self.get_iso_images()
-        for server_group in self.server_groups:
-            self.get_sever_plans(server_group['id'])
+        self.account = self._get_parameter('account')
+        self.templates = self._get_parameter('template')
+        self.limits = self._get_parameter('account.limit')
+        self.datacenters = self._get_parameter('datacenter')
+        self.balance = self._get_parameter('account.balance')
+        self.server_groups = self._get_parameter('server-group')
+        self._get_servers()
+        self._get_ssh_keys()
+        self._get_iso_images()
+        self._get_sever_plans()
 
     def __str__(self) -> str:
         account = f'Account:\n  Created: {self.account["created"]}\n  Forecast: {self.account["forecast"]}'
@@ -61,38 +61,20 @@ class Account(Auth):
         result = f'{account}\n{balance}\n{limits}'
         return result
 
-    def get_parameter(self, endpoint: str, parameter_id: int = None):
-        """
-        Get parameter by its endpoint
-        Args:
-            endpoint (str): Endpoint name after API URL
-            parameter_id (int): Optional. If parameter can get id
-        Returns:
-            Result of http request
-        Raises:
-            HTTPError: If http status code not 20X
-        """
-        url = f'{self.api_url}{endpoint}'
-        if parameter_id:
-            url = f'{url}/{parameter_id}'
-        response = self.session.get(url)
-        return check_response(response)
-
-    def get_sever_plans(self, sg_id: int) -> list:
+    def _get_sever_plans(self):
         """
         Get server plans for a specific server group
-        Args:
-            sg_id (int): Server group id
         Returns:
-            List of dictionaries with server plans
+            None
         Raises:
             HTTPError: If http status code not 20X
         """
-        url = f'{self.api_url}server-plan/{sg_id}'
-        response = self.session.get(url)
-        self.server_plans[sg_id] = check_response(response)
+        for server_group in self.server_groups:
+            url = f'{self.api_url}server-plan/{server_group["id"]}'
+            response = self.session.get(url)
+            self.server_plans[server_group["id"]] = check_response(response)
 
-    def get_iso_images(self) -> list:
+    def _get_iso_images(self):
         """
         Get available ISO images
         Returns:
@@ -100,12 +82,12 @@ class Account(Auth):
         Raises:
             HTTPError: If http status code not 20X
         """
-        iso_images = self.get_parameter('iso')
+        iso_images = self._get_parameter('iso')
         if iso_images:
             for iso_image in iso_images:
-                self.ssh_keys.append(self.get_parameter('iso', iso_image['id']))
+                self.iso_images.append(IsoImage(self._get_parameter('iso', iso_image['id'])))
 
-    def get_ssh_keys(self) -> list:
+    def _get_ssh_keys(self):
         """
         Get ssh keys list
         Returns:
@@ -114,9 +96,15 @@ class Account(Auth):
             HTTPError: If http status code not 20X
         """
         self.ssh_keys = []
-        ssh_keys = self.get_parameter('ssh-key')
+        ssh_keys = self._get_parameter('ssh-key')
         for ssh_key in ssh_keys:
-            self.ssh_keys.append(self.get_parameter('ssh-key', ssh_key['id']))
+            self.ssh_keys.append(SshKey(self._get_parameter('ssh-key', ssh_key['id'])))
+
+    def _get_servers(self):
+        self.servers = []
+        servers = self._get_parameter('server')
+        for server in servers:
+            self.servers.append(Server(self._get_parameter('server', server['id'])))
 
     def create_user(self, email: str):
         """
@@ -149,7 +137,7 @@ class Account(Auth):
         url = f'{self.api_url}ssh-key'
         payload = json.dumps({'name': name, 'data': data})
         response = self.session.post(url, data=payload)
-        self.get_ssh_keys()
+        self._get_ssh_keys()
         return check_response(response)
 
     def delete_ssh_key(self, ssh_key_id: int):
@@ -162,12 +150,7 @@ class Account(Auth):
         """
         url = f'{self.api_url}ssh-key/{ssh_key_id}'
         response = self.session.delete(url)
-        self.get_ssh_keys()
+        self._get_ssh_keys()
         return check_response(response)
 
-    def get_servers(self) -> list:
-        self.servers = []
-        servers = self.get_parameter('server')
-        for server in servers:
-            self.servers.append(self.get_parameter('server', server['id']))
-
+    # def create_server(self, server: Server):
